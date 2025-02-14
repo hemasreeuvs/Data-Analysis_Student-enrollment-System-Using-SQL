@@ -1,0 +1,186 @@
+This RDBMS have altogether 5 tables:
+
+1. Student Table
+
+DDL Statements:
+CREATE TABLE Student3(
+Student_Id INT PRIMARY KEY ,
+First_Name VARCHAR(30),
+Last_Name VARCHAR(30),
+DOB DATE,
+Contact VARCHAR(30),
+CONSTRIANT Std_PK PRIMARY KEY (Student_Id)
+);
+
+DML Statements:
+INSERT INTO Student3 VALUES(1,'sathvika','Kankanala','06-06-1999','9989237105');
+INSERT INTO Student3 VALUES(2,'sony','muthyala','06-06-2004','9989237106');
+INSERT INTO Student3 VALUES(3,'hema','sree','02-06-1999','9989237108');
+INSERT INTO Student3 VALUES(4,'sru','Kodipyaka','06-06-2002','9989237109');
+INSERT INTO Student3 VALUES(5,'shalini','vadlamani','06-06-2003','9989237104');
+
+2. 
+Qualification Table:
+
+DDL Statements:
+CREATE TABLE Qualification(
+Branch VARCHAR(30),
+Grade INTEGER,
+English_Proficiencyexam VARCHAR(30),
+Year_ofPassout INTEGER,
+Score INTEGER
+);
+
+DML Statements:
+INSERT  INTO Qualification VALUES ('EEE','9','Duolingo','2019','120');
+INSERT  INTO Qualification VALUES ('ECE','8','IELTS','2018','7');
+INSERT  INTO Qualification VALUES ('Mechanical','7','PTE','2020','8');
+INSERT  INTO Qualification VALUES ('CSE','9','TOFL','2021','132');
+INSERT  INTO Qualification VALUES ('IT','9','Duolingo','2022','125');
+
+
+3. Course Table:
+
+DDL Statements:
+CREATE TABLE Course(
+Student_Id INTEGER ,
+Course_Id VARCHAR(30),
+Course_Name VARCHAR(30),
+Course_Code INTEGER PRIMARY KEY,
+Course_TIME INTEGER,
+Course_Mode VARCHAR(30),
+CONSTRIANT Std_PK PRIMARY KEY (Course_Code)
+);
+
+DML Statements:
+INSERT INTO Course VALUES('1','IFT','Artifical Intelligence','520','12','Online');
+INSERT INTO Course VALUES('2','IFT','Cloud Computing','521','1','Offline');
+INSERT INTO Course VALUES('3','IFT','Cyber Security','522','2','Poly');
+INSERT INTO Course VALUES('4','IFT','Data Visualization','522','3','Tempe');
+INSERT INTO Course VALUES('5','IFT','Big data analytics','523','4','Online');
+
+4.Seminar Table:
+
+DDL Statements:
+CREATE TABLE Seminars(
+Student_Id INTEGER,
+Seminar_Topic VARCHAR(30),
+Seminar_Place VARCHAR(30),
+Seminar_Hall VARCHAR(30),
+Seminar_Time INTEGER,
+Seminar_Speaker VARCHAR(30)
+FOREIGN KEY (Student_Id)
+REFERENCES Student(Student_Id)
+);
+DML Statements:
+INSERT INTO Seminars VALUES('1','Surface Computing','Tempe','Durham hall','3','David')
+INSERT INTO Seminars VALUES('2','Cloud Storage','Poly','Barett Hall','5','James')
+INSERT INTO Seminars VALUES('3','Security in social networks','Downtown ','W.P CAREY','7','Scott')
+INSERT INTO Seminars VALUES('4','Network security','West Campus',' A G BR hall' ,'9','Chris')
+INSERT INTO Seminars VALUES('5','Cryptography','Phoenix','Technology Center','11','Alex')
+
+
+5. Professor Table:
+DDL Statements:
+CREATE TABLE Professor(
+Course_Code INTEGER PRIMARY KEY,
+Prof_Name VARCHAR(30),
+Prof_Roomnum INTEGER,
+Prof_Email NVARCHAR(30),
+Prof_Designation VARCHAR(30),
+FOREIGN KEY (CREATE TABLE Professor(Course_Code),
+REFERENCES Course(CREATE TABLE Professor(Course_Code)
+);
+
+DML Statements:
+INSERT INTO Professor VALUES('501','SriLakshmi','102','sri.lakshmi@gmail.com','Phd')
+INSERT INTO Professor VALUES('502','Sundari','202','sunadri@gmail.com','Masters')
+INSERT INTO Professor VALUES('503','Rohan','302','rohan@gmail.com','M.Tech')
+INSERT INTO Professor VALUES('504','Rishi','402','rishi143@gmail.com','MBA')
+INSERT INTO Professor VALUES('505','Ashish','502','ashish0210@gmail.com','Phd')
+
+
+Now we create Stored Procedures and Triggers so that there are some attributes can be updated whenever it get added:
+Stored Procedures
+1.	Procedure to update the First Name of the student in student table.
+
+USE StudentDetails
+
+Create Procedure Student1
+AS
+Select *from Student3
+
+Create Procedure [dbo] .[UpdateMember]
+@First_Name varchar(50)
+AS
+UPDATE Student3
+SET First_Name =@First_Name
+Where First_Name = 'Sony'
+
+
+2.	Procedure to fetch the details of the students
+
+Create Procedure SelectallStudent @First_Name varchar(30) , @Last_Name varchar(30) 
+	AS 
+	Select * From Student3 
+	GO;
+
+1.	Trigger to captalize the first letter of first name in student table
+
+create trigger student_Name on Student3 after insert,update
+as
+update Student3 set First_Name = UPPER(left(First_Name,1)) + SUBSTRING(First_Name,2,LEN(First_Name))
+where First_Name in (select First_Name from inserted);
+
+
+
+2.	Trigger to get the deleted data.
+
+Create Trigger dbo.trgStudentUpdate
+on Student3
+AFTER UPDATE
+AS 
+INSERT INTO Student3 VALUES(2,'sony','muthyala','06-06-2004','9989237106');
+Select First_Name,'UPDATE',GETDATE() FROM DELETED;
+
+
+Queries:
+
+Query – 1 : To find the students who are having date of birth between certain period.
+Select First_Name, Last_Name
+FROM Student3
+Where DOB BETWEEN '1999-02-02' AND '2003-05-05'
+
+Query – 2 : To fetch the details of the students who are taking the course online.
+Select Student3.Student_ID, Course.Course_Mode
+from Student3
+INNER JOIN Course ON Student3.Student_ID=Course.Student_Id;
+
+Query – 3 : To get the data of the courses taught by respective professors.
+Select Course.Course_Code,Professor.Prof_Name
+From Course
+FULL JOIN Professor
+on Course.Course_Code = Professor.Course_Code
+ORDER BY Course.Course_Code
+
+
+Query – 4 : Representing all main courses of the institution.
+Select Course_Name from Course
+
+
+Query – 5 : Fetching data of students where the first name comes in alphabetical order
+Select COUNT(Student_Id), Course_Name
+From Course
+GROUP BY Course_Name
+ORDER BY Count(Course_Code) ASC;
+
+
+
+
+
+
+
+
+
+
+
